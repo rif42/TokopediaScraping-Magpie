@@ -7,63 +7,44 @@ import time
 import pandas as pd
 from selenium.common.exceptions import NoSuchElementException
 
-driver = webdriver.Firefox()
-url = "https://www.tokopedia.com/search?st=&q=rockbros&srp_component_id=02.01.00.00&srp_page_id=&srp_page_title=&navsource="
-driver.get(url)
+def tokpedscrape (keyword, page):
+    driver = webdriver.Firefox()
+    url = (f"https://www.tokopedia.com/search?st=&q={keyword}&srp_component_id=02.01.00.00&srp_page_id=&srp_page_title=&navsource=")
+    driver.get(url)
+    counter_page = 0
+    datas = []
 
-counter_page = 0
-datas = []
+    while counter_page < page:
+        try:
+            for _ in range(0, 7500, 500):
+                time.sleep(0.1)
+                driver.execute_script("window.scrollBy(0,500)")
 
-while counter_page < 2:
-    try:
-        for _ in range(0, 7500, 500):
-            time.sleep(0.1)
-            driver.execute_script("window.scrollBy(0,500)")
+            card = driver.find_elements(By.XPATH, "//div[@class='css-llwpbs']")
 
+            for i in range(len(card)):
+                try:
+                    sold_element = card[i].find_element(By.XPATH, ".//div/div/div/div/div/div[2]/a//span[@class='prd_label-integrity css-1sgek4h']").text
+                except NoSuchElementException:
+                    sold_element = "0"
+                datas.append({ # asked chatgpt, didnt help much, figured out everything by using firefox devtools
+                    'name': card[i].find_element(By.XPATH, ".//div/div/div/div/div/div[2]/a/div[@class='prd_link-product-name css-3um8ox']").text,
+                    'price': card[i].find_element(By.XPATH, ".//div/div/div/div/div/div[2]/a//div[@class='prd_link-product-price css-h66vau']").text,
+                    'sold': sold_element,
+                    'page': counter_page
+                })
 
-        # count number of figure tags
+            counter_page += 1
+            next_page = driver.find_element(By.XPATH, "//button[@aria-label='Laman berikutnya']")
+            next_page.click()
+        except Exception as e:
+            print("ERROR", e)
+            break
+    df = pd.DataFrame(datas)
+    df.to_csv(f'{keyword}_{page}.csv', index=False)
+    return df
 
-        # title = driver.find_elements(
-        #     By.XPATH, "//div[@class='prd_link-product-name css-3um8ox']")
-        # price = driver.find_elements(
-        #     By.XPATH, "//div[@class='prd_link-product-price css-h66vau']")
-        # sold = driver.find_elements(
-        #     By.XPATH, "//span[@class='prd_label-integrity css-1sgek4h']")
-        # print(len(card))
-        # print(len(title))
-        # print(len(price))
-        # print(len(sold))
+def __main__():
+    tokpedscrape("iphone", 2)
 
-        # for i in range(len(title)):
-        #     datas.append({
-        #         'name': title[i].text,
-        #         'price': price[i].text,   
-        #         'sold': sold[i].text
-        #     })
-
-        card = driver.find_elements(
-            By.XPATH, "//div[@class='css-llwpbs']")
-
-        for i in range(len(card)):
-            try:
-                sold_element = card[i].find_element(By.XPATH, ".//div/div/div/div/div/div[2]/a//span[@class='prd_label-integrity css-1sgek4h']").text
-            except NoSuchElementException:
-                sold_element = "0"
-            datas.append({ # asked chatgpt, didnt help much, figured out everything by using firefox devtools
-                'name': card[i].find_element(By.XPATH, ".//div/div/div/div/div/div[2]/a/div[@class='prd_link-product-name css-3um8ox']").text,
-                'price': card[i].find_element(By.XPATH, ".//div/div/div/div/div/div[2]/a//div[@class='prd_link-product-price css-h66vau']").text,
-                'sold': sold_element
-            })
-
-        counter_page += 1
-        next_page = driver.find_element(
-            By.XPATH, "//button[@aria-label='Laman berikutnya']")
-        next_page.click()
-    except Exception as e:
-        print("ERROR", e)
-        break
-
-# convert datas into dataframe
-df = pd.DataFrame(datas)
-# export dataframe to csv
-df.to_csv('tokopedia.csv', index=False)
+__main__()
