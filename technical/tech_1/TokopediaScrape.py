@@ -37,7 +37,7 @@ while counter_page < 2:
         # for i in range(len(title)):
         #     datas.append({
         #         'name': title[i].text,
-        #         'price': price[i].text,
+        #         'price': price[i].text,   
         #         'sold': sold[i].text
         #     })
 
@@ -45,8 +45,14 @@ while counter_page < 2:
             By.XPATH, "//div[@class='css-llwpbs']")
 
         for i in range(len(card)):
-            datas.append({
+            try:
+                sold_element = card[i].find_element(By.XPATH, ".//div/div/div/div/div/div[2]/a//span[@class='prd_label-integrity css-1sgek4h']").text
+            except NoSuchElementException:
+                sold_element = "0"
+            datas.append({ # asked chatgpt, didnt help much, figured out everything by using firefox devtools
                 'name': card[i].find_element(By.XPATH, ".//div/div/div/div/div/div[2]/a/div[@class='prd_link-product-name css-3um8ox']").text,
+                'price': card[i].find_element(By.XPATH, ".//div/div/div/div/div/div[2]/a//div[@class='prd_link-product-price css-h66vau']").text,
+                'sold': sold_element
             })
 
         counter_page += 1
