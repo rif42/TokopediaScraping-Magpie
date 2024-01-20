@@ -1,3 +1,5 @@
+### There are 3 readmes in this repo. in technical/tech1, technical/tech2, and on root directory. Please check all of them
+
 # About
 This is a scraping script intended to scrape items in tokopedia through their search page.
 
