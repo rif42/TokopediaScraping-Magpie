@@ -38,7 +38,7 @@ def tokpedscrape (keyword, page):
                 except NoSuchElementException:
                     price_element = "no price listed"
 
-                datas.append({ # asked chatgpt, didnt help much, figured out everything by using firefox devtools
+                datas.append({
                     'name': name_element,
                     'price': price_element,
                     'sold': sold_element,
