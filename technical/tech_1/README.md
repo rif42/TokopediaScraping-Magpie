@@ -24,4 +24,6 @@ The preprocessing is a bit challenging, but given my python background, i unders
 
 ## Usage of ChatGPT
 I see chatpgt as a faster and more convenient google search. Give it enough information and context, and it will help you. But if you ask too much, it will hallucinate and lead you astray. Also, you can't ask ChatGPT a question if you dont know what you're asking.  
+
+
 Generally, i try to figure out the workflow first, then build it slowly, asking chatgpt when im stuck or forgot. Then after its done, i usually ask chatgpt to optimize the code and clean it up a bit. At this point, chatgpt has enough information to actually do its work, and i can get new lessons on how to optimize my code so i can implement it myself in the future.
