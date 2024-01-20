@@ -11,7 +11,7 @@ def tokpedscrape (keyword, page):
     driver = webdriver.Firefox()
     url = (f"https://www.tokopedia.com/search?st=&q={keyword}&srp_component_id=02.01.00.00&srp_page_id=&srp_page_title=&navsource=")
     driver.get(url)
-    counter_page = 0
+    counter_page = 1
     datas = []
 
     while counter_page < page:
@@ -41,6 +41,18 @@ def tokpedscrape (keyword, page):
             print("ERROR", e)
             break
     df = pd.DataFrame(datas)
+    preprocess(df,keyword,page)
+    
+def preprocess (df,keyword,page):
+    df['name'] = df['name'].str.replace('"', '')
+
+    df['price'] = df['price'].str.replace('Rp', '').str.replace(",", '').str.replace(".", '').str.replace(" ", '').str.replace("jt", '00000')
+    df['price'] = df['price'].str.split('-')
+    df['price'] = df['price'].apply(lambda x: [int(val) for val in x]) # chatgpt
+    df['price'] = df['price'].apply(lambda x: sum(x)/len(x)).apply(lambda x: round(x)) # get average between 2 spread prices
+
+    df['sold'] = df['sold'].str.replace('terjual', '').str.replace('rb', '000').str.replace('+', '').astype(int)
+
     df.to_csv(f'{keyword}_{page}.csv', index=False)
     return df
 
